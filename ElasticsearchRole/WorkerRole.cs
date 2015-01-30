@@ -30,6 +30,8 @@ namespace ElasticsearchRole
         {
             try
             {
+               
+
                 var configTasks = new Task[] { javaManager.EnsureConfigured(), elasticsearchManager.EnsureConfigured(), pluginManager.EnsureConfigured() };
                 Trace.TraceInformation("Attempting to configure node: {0}", nodeName);
                 Task.WaitAll(configTasks, cancellationTokenSource.Token);
@@ -60,8 +62,12 @@ namespace ElasticsearchRole
             }
         }
 
+       
+
         public override bool OnStart()
         {
+
+            RoleEnvironment.Changing += RoleEnvironmentOnChanging;
             // Not sure what this should be. Hopefully storage over smb doesn't open a million connections
             ServicePointManager.DefaultConnectionLimit = 12;
 
@@ -182,6 +188,11 @@ namespace ElasticsearchRole
             Trace.TraceInformation("ElasticsearchRole has been started");
 
             return result;
+        }
+
+        private void RoleEnvironmentOnChanging(object sender, RoleEnvironmentChangingEventArgs e)
+        {
+            e.Cancel = true;
         }
 
         public override void OnStop()
